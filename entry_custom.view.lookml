@@ -927,5 +927,6 @@
     
   sets:
       entry_custom_fields:
-      - smoker   
+      - smoker 
+      - retired
 
