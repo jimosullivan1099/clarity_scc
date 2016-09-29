@@ -66,9 +66,13 @@
 #     type: int
 #     sql: ${TABLE}.ref_charge_type
 # 
-#   - dimension: ref_delivery_type
-#     type: int
-#     sql: ${TABLE}.ref_delivery_type
+  - dimension: ref_delivery_type
+    type: int
+    sql: ${TABLE}.ref_delivery_type
+    
+  - dimension: deleted
+    type: yesno
+    sql: ${TABLE}.deleted    
 
 #   - dimension: ref_funding
 #     type: int

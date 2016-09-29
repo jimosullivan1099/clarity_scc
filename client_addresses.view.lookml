@@ -55,7 +55,7 @@
     sql: ${TABLE}.ref_client
 
   - dimension: ref_type
-    type: int
+    label: 'Address Type'
     sql: ${TABLE}.ref_type
     sql: fn_getPicklistValueName('address_types',${TABLE}.ref_type)    
       

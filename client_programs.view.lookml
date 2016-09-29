@@ -9,9 +9,12 @@
     type: int
     sql: ${TABLE}.id
 
-#   - measure: count_enrollments
-#     type: count
-#     sql: ${id}
+  - filter: date_filter
+    label: 'Reporting Period Filter'
+    type: date
+    sql: |
+      ${start_raw} <= {% date_end date_filter %} 
+      AND (${end_raw} >= {% date_start date_filter %} OR ${end_raw} is NULL)
 
 
   - dimension_group: added
@@ -23,7 +26,7 @@
   - dimension_group: end
     label: 'Exit Date'
     type: time
-    timeframes: [date, week, month]
+    timeframes: [date, week, month, year, raw]
     convert_tz: false
     sql: ${TABLE}.end_date
     
@@ -82,7 +85,7 @@
     sql: ${ref_client}
     filters:
       head_of_household: yes
-      entry_screen.chronic_homeless_calculation: Chronic Homeless
+      entry_screen.chronic_homeless_calculation: Yes
 
   - dimension: ref_household
     label: 'Household Id'
@@ -94,20 +97,21 @@
     type: int
     sql: ${TABLE}.ref_program
 
-  - dimension: ref_user
-    hidden: true
-    type: int
-    sql: ${TABLE}.ref_user
+  - dimension: ref_user 
+    label: 'User Creating'
+    sql: fn_getUserNameById(${TABLE}.ref_user)
 
-  - dimension: ref_user_updated
-    hidden: true
-    type: int
-    sql: ${TABLE}.ref_user_updated
+  - dimension: assigned_staff
+    sql: CONCAT(${members.first_name},' ',${members.last_name})
+
+  - dimension: ref_user_updated 
+    label: 'User Updating'
+    sql: fn_getUserNameById(${TABLE}.ref_user_updated)
 
   - dimension_group: start
     label: 'Entry Date'
     type: time
-    timeframes: [date, week, month]
+    timeframes: [date, week, month, year, raw]
     convert_tz: false
     sql: ${TABLE}.start_date
     
@@ -115,7 +119,7 @@
     label: 'Days in Project'
     bypass_suggest_restrictions: true
     suggest_dimension: 
-#     type: int
+    type: int
     sql: DATEDIFF(COALESCE(${end_date},NOW()),${start_date})
     
   - dimension: days_since_start_tier
@@ -140,15 +144,12 @@
       NULL
       ELSE MAX( COALESCE(${end_date},'2099-12-31'))
       END
-
-#     sql: |
-#       CASE
-#       WHEN ${enrollments.head_of_household} = 1
-#       AND ${TABLE}.disabled = 1 AND  
-#       ( ${TABLE}.chronic_1 = 1 OR  ${TABLE}.chronic_2 = 4) 
-#       THEN 'Chronic Homeless'    
-#       ELSE 'Not Chronic Homeless'    
-#       END
+      
+  - measure: last_entry
+    label: 'Last Entry'
+    type: date
+    sql: MAX(${start_date})
+      
 
 
 
@@ -180,16 +181,7 @@
             else: unknown
 
 
-#   - filter: report_start_date
-#     type: time
-#     timeframes: [date]
-#     suggestions: ['2014-01-01','2014-07-01']
-#     
-#   - filter: report_end_date
-#     type: time
-#     timeframes: [date]
-#     suggestions: ['2014-01-01','2014-07-01'] 
-  
+    
   - measure: count
     type: count
       

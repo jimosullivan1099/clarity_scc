@@ -44,6 +44,9 @@
             Households with only Children: ${count_adults} = 0 and ${count_children} > 0
             else: Unknown 
 
+#   - dimension: total_clients
+#     sql: |
+#          (Select count(distinct ref_client) from client_programs where ref_household = ${TABLE}.ref_household)
 
 
   sets:
